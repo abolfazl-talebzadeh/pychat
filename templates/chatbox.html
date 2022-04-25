@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Live Chat!</title>
+</head>
+<body>
+    Hello and welcome dear {{name}}!
+    <p>
+        The user {{targetUser}} is ready to talk to you at port {{targetPort}}
+    </p>
+    <p>
+        <label for="">Enter your message here:</label>
+    </p>
+    <p>
+    <textarea name="receivedMessegaes" id="receivedMessegaes" cols="70" rows="10" readonly></textarea>
+    </p>
+    <p>
+        <textarea name="sendingMessages" id="sendingMessages" cols="70" rows="3"></textarea>
+    </p>
+    <p>
+    <button name="sendBoutton" id="sendBoutton" onclick="">Send</button>
+    </p>
+</body>
+<script>
+    $(document).ready(function() {
+        var serverAndPort='http://127.0.0.1:'.concat(location.port)
+        var socket = io.connect(serverAndPort);
+
+        socket.on('connect', function() {
+            msg={
+                'type':'connection',
+                'body':'200',
+                'port':location.port
+            }
+            socket.send(msg)
+        });
+
+        socket.on('message', function(msg) {
+            var psconsole = $('#receivedMessegaes');
+            $("#receivedMessegaes").append(msg)
+            if(psconsole.length)
+            psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+        });
+
+
+        $('#sendBoutton').on('click', function() {
+            msg={
+                'type':'msg',
+                'body':$('#sendingMessages').val().trim()
+            }
+            socket.send(msg);
+            $('#sendingMessages').val('');
+            $('#sendingMessages').setSe
+        });
+
+
+
+
+        $('#sendingMessages').keypress(function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                if ($('#sendingMessages').val().trim()==''){
+                    alert("You can't send an empty message!");
+                    $('#sendingMessages').val('');
+                }
+                else{
+                    $('#sendBoutton').trigger("click");
+                }
+
+              
+            }
+        });
+    })
+</script>
+</html>
